@@ -116,4 +116,36 @@ class NoteRepository {
       throw Exception("error:$e");
     }
   }
+
+  Future<void> addPin(String userId, noteId) async {
+    try {
+      final response = await http.patch(
+        Uri.parse("$baseUrl/addPin/$userId/$noteId"),
+        headers: {"Content-Type": "application/json"},
+      );
+      if (response.statusCode == 200) {
+        debugPrint("result :${response.body}");
+      } else {
+        debugPrint("gagal pin note");
+      }
+    } catch (e) {
+      throw Exception("Error:$e");
+    }
+  }
+
+  Future<void> deletePin(String userId, noteId) async {
+    try {
+      final response = await http.patch(
+        Uri.parse("$baseUrl/deletePin/$userId/$noteId"),
+        headers: {"Content-Type": "application/json"},
+      );
+      if (response.statusCode == 200) {
+        debugPrint("result :${response.body}");
+      } else {
+        debugPrint("gagal hapus pin");
+      }
+    } catch (e) {
+      throw Exception("Error:$e");
+    }
+  }
 }

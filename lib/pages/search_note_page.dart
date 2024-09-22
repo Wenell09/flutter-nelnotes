@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_nelnotes/bloc/bloc/search_note_bloc.dart';
+import 'package:flutter_nelnotes/bloc/search_note/search_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/detail_note/detail_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/layout/layout_bloc.dart';
 import 'package:flutter_nelnotes/bloc/user/user_bloc.dart';
@@ -56,7 +56,8 @@ class SearchNotePage extends StatelessWidget {
                         builder: (context, state) {
                           if (state is UserLoaded) {
                             return TextField(
-                              style: const TextStyle(color: Colors.black),
+                              style: const TextStyle(
+                                  color: Colors.black, fontSize: 16),
                               controller: inputSearch,
                               onChanged: (value) {
                                 context
@@ -96,13 +97,13 @@ class SearchNotePage extends StatelessWidget {
                                         ),
                                       );
                                     }
-                                    return const SizedBox();
+                                    return const Text("");
                                   },
                                 ),
                                 border: InputBorder.none,
                                 hintText: "Cari note yuk!",
                                 hintStyle: const TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 17,
                                   color: Colors.grey,
                                   fontWeight: FontWeight.w300,
                                   overflow: TextOverflow.ellipsis,
@@ -110,7 +111,7 @@ class SearchNotePage extends StatelessWidget {
                               ),
                             );
                           }
-                          return const SizedBox();
+                          return const Text("");
                         },
                       ),
                     ),
@@ -168,6 +169,11 @@ class SearchNotePage extends StatelessWidget {
                           return InkWell(
                             borderRadius: BorderRadius.circular(10),
                             onTap: () {
+                              context
+                                  .read<ValidasiSearchBloc>()
+                                  .add(ShowButtonClear(title: ""));
+                              context.read<SearchNoteBloc>().add(
+                                  SearchNote(userId: note.userId, title: ""));
                               context.read<DetailNoteBloc>().add(
                                     GetDetailNote(
                                       userId: note.userId,
@@ -229,6 +235,11 @@ class SearchNotePage extends StatelessWidget {
                             return InkWell(
                               borderRadius: BorderRadius.circular(10),
                               onTap: () {
+                                context
+                                    .read<ValidasiSearchBloc>()
+                                    .add(ShowButtonClear(title: ""));
+                                context.read<SearchNoteBloc>().add(
+                                    SearchNote(userId: note.userId, title: ""));
                                 context.read<DetailNoteBloc>().add(
                                       GetDetailNote(
                                         userId: note.userId,

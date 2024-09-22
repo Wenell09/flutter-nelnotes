@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_nelnotes/bloc/search_note/search_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/detail_note/detail_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/note/note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/user/user_bloc.dart';
@@ -83,6 +84,9 @@ class EditNotePage extends StatelessWidget {
                           context
                               .read<NoteBloc>()
                               .add(GetNote(userId: state.userId));
+                          context
+                              .read<SearchNoteBloc>()
+                              .add(SearchNote(userId: state.userId, title: ""));
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }

@@ -6,14 +6,9 @@ import 'package:flutter_nelnotes/bloc/shared_auth/shared_auth_bloc.dart';
 import 'package:flutter_nelnotes/bloc/user/user_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

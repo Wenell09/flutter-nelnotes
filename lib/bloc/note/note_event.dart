@@ -38,3 +38,19 @@ class DeleteNote extends NoteEvent {
   @override
   List<Object?> get props => [userId, noteId];
 }
+
+class AddPin extends NoteEvent {
+  final String userId, noteId;
+  AddPin({required this.userId, required this.noteId});
+
+  @override
+  List<Object?> get props => [userId, noteId];
+}
+
+class DeletePin extends NoteEvent {
+  final String userId, noteId;
+  DeletePin({required this.userId, required this.noteId});
+
+  @override
+  List<Object?> get props => [userId, noteId];
+}

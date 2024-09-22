@@ -44,3 +44,13 @@ final class NoteDeleteSuccess extends NoteState {
   @override
   List<Object?> get props => [];
 }
+
+final class NoteAddPinSuccess extends NoteState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class NoteDeletePinSuccess extends NoteState {
+  @override
+  List<Object?> get props => [];
+}

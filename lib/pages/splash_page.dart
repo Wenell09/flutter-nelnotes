@@ -4,14 +4,9 @@ import 'package:flutter_nelnotes/bloc/note/note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/shared_auth/shared_auth_bloc.dart';
 import 'package:flutter_nelnotes/bloc/user/user_bloc.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
-  @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SharedAuthBloc, SharedAuthState>(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_nelnotes/bloc/search_note/search_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/detail_note/detail_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/note/note_bloc.dart';
 import 'package:flutter_nelnotes/helper/format_time/format_time.dart';
@@ -22,6 +23,63 @@ class DetailPage extends StatelessWidget {
           ),
         ),
         actions: [
+          BlocBuilder<DetailNoteBloc, DetailNoteState>(
+            builder: (context, state) {
+              if (state is DetailNoteLoaded) {
+                final isPin =
+                    state.detailNote.any((data) => data.isPin == true);
+                if (isPin) {
+                  return BlocListener<NoteBloc, NoteState>(
+                    listener: (context, state) {
+                      if (state is NoteDeletePinSuccess) {
+                        context.read<NoteBloc>().add(GetNote(userId: userId));
+                        context
+                            .read<DetailNoteBloc>()
+                            .add(GetDetailNote(userId: userId, noteId: noteId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("berhasil menghapus pin")));
+                      }
+                    },
+                    child: IconButton(
+                        onPressed: () => context
+                            .read<NoteBloc>()
+                            .add(DeletePin(userId: userId, noteId: noteId)),
+                        icon: const Icon(
+                          Icons.push_pin,
+                          color: Colors.white,
+                        )),
+                  );
+                }
+                return BlocListener<NoteBloc, NoteState>(
+                  listener: (context, state) {
+                    if (state is NoteAddPinSuccess) {
+                      context.read<NoteBloc>().add(GetNote(userId: userId));
+                      context
+                          .read<DetailNoteBloc>()
+                          .add(GetDetailNote(userId: userId, noteId: noteId));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Note berhasil di pin")));
+                    }
+                  },
+                  child: IconButton(
+                      onPressed: () => context
+                          .read<NoteBloc>()
+                          .add(AddPin(userId: userId, noteId: noteId)),
+                      icon: const Icon(
+                        Icons.push_pin_outlined,
+                        color: Colors.white,
+                      )),
+                );
+              }
+              return IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.push_pin_outlined,
+                    color: Colors.white,
+                  ));
+            },
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed("/editNote"),
             icon: const Icon(
@@ -33,6 +91,9 @@ class DetailPage extends StatelessWidget {
             listener: (context, state) {
               if (state is NoteDeleteSuccess) {
                 context.read<NoteBloc>().add(GetNote(userId: userId));
+                context
+                    .read<SearchNoteBloc>()
+                    .add(SearchNote(userId: userId, title: ""));
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("berhasil menghapus note")));
                 Navigator.of(context).pop();
