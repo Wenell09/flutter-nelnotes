@@ -48,7 +48,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<DeleteNote>((event, emit) async {
       try {
         await _noteRepository.deleteNote(event.userId, event.noteId);
-        emit(NoteDeleteSuccess());
+        emit(NoteDeleteSuccess(userId: event.userId));
       } catch (e) {
         emit(NoteError(error: e.toString()));
       }
@@ -57,7 +57,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<AddPin>((event, emit) async {
       try {
         await _noteRepository.addPin(event.userId, event.noteId);
-        emit(NoteAddPinSuccess());
+        emit(NoteAddPinSuccess(userId: event.userId));
       } catch (e) {
         emit(NoteError(error: e.toString()));
       }
@@ -66,7 +66,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<DeletePin>((event, emit) async {
       try {
         await _noteRepository.deletePin(event.userId, event.noteId);
-        emit(NoteDeletePinSuccess());
+        emit(NoteDeletePinSuccess(userId: event.userId));
       } catch (e) {
         emit(NoteError(error: e.toString()));
       }

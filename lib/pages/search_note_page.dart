@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_nelnotes/bloc/note/note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/search_note/search_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/detail_note/detail_note_bloc.dart';
 import 'package:flutter_nelnotes/bloc/layout/layout_bloc.dart';
@@ -127,109 +128,59 @@ class SearchNotePage extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          BlocBuilder<LayoutBloc, LayoutState>(
-            bloc: context.read<LayoutBloc>()..add(LayoutLoad()),
-            builder: (context, layoutState) {
-              return BlocBuilder<SearchNoteBloc, SearchNoteState>(
-                builder: (context, state) {
-                  if (state is SearchNoteLoading) {
-                    if (layoutState.isGrid) {
-                      return const ShimmerLoading();
-                    } else {
-                      return const ShimmerLoadingRow();
-                    }
-                  } else if (state is SearchNoteLoaded) {
-                    if (layoutState.isGrid) {
-                      if (state.note.isEmpty) {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 1.2,
-                          child: const Center(
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              "Note kosong,mari buat note yuk!",
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          ),
-                        );
+          BlocListener<NoteBloc, NoteState>(
+            listener: (context, state) {
+              if (state is NoteAddSuccess) {
+                context
+                    .read<SearchNoteBloc>()
+                    .add(SearchNote(userId: state.userId, title: ""));
+              } else if (state is NoteEditSuccess) {
+                context
+                    .read<SearchNoteBloc>()
+                    .add(SearchNote(userId: state.userId, title: ""));
+              } else if (state is NoteDeleteSuccess) {
+                context
+                    .read<SearchNoteBloc>()
+                    .add(SearchNote(userId: state.userId, title: ""));
+              }
+            },
+            child: BlocBuilder<LayoutBloc, LayoutState>(
+              bloc: context.read<LayoutBloc>()..add(LayoutLoad()),
+              builder: (context, layoutState) {
+                return BlocBuilder<SearchNoteBloc, SearchNoteState>(
+                  builder: (context, state) {
+                    if (state is SearchNoteLoading) {
+                      if (layoutState.isGrid) {
+                        return const ShimmerLoading();
+                      } else {
+                        return const ShimmerLoadingRow();
                       }
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 15,
-                          childAspectRatio: 2 / 2.3,
-                        ),
-                        padding: const EdgeInsets.all(10),
-                        itemBuilder: (context, index) {
-                          final note = state.note[index];
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () {
-                              context
-                                  .read<ValidasiSearchBloc>()
-                                  .add(ShowButtonClear(title: ""));
-                              context.read<SearchNoteBloc>().add(
-                                  SearchNote(userId: note.userId, title: ""));
-                              context.read<DetailNoteBloc>().add(
-                                    GetDetailNote(
-                                      userId: note.userId,
-                                      noteId: note.noteId,
-                                    ),
-                                  );
-                              Navigator.of(context).pushNamed(
-                                "/detail",
-                                arguments: DetailArguments(
-                                  userId: note.userId,
-                                  noteId: note.noteId,
-                                ),
-                              );
-                            },
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      note.title,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Flexible(child: Text(note.deskripsi))
-                                  ],
-                                ),
+                    } else if (state is SearchNoteLoaded) {
+                      if (layoutState.isGrid) {
+                        if (state.note.isEmpty) {
+                          return SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.2,
+                            child: const Center(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                "Note kosong,mari buat note yuk!",
+                                style: TextStyle(fontSize: 17),
                               ),
                             ),
                           );
-                        },
-                        itemCount: state.note.length,
-                      );
-                    } else {
-                      if (state.note.isEmpty) {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 1.2,
-                          child: const Center(
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              "Note kosong,mari buat note yuk!",
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          ),
-                        );
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: ListView.builder(
+                        }
+                        return GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 15,
+                            crossAxisSpacing: 15,
+                            childAspectRatio: 2 / 2.3,
+                          ),
+                          padding: const EdgeInsets.all(10),
                           itemBuilder: (context, index) {
                             final note = state.note[index];
                             return InkWell(
@@ -255,11 +206,8 @@ class SearchNotePage extends StatelessWidget {
                                 );
                               },
                               child: Card(
-                                child: Container(
+                                child: Padding(
                                   padding: const EdgeInsets.all(20),
-                                  width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.15,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -271,7 +219,7 @@ class SearchNotePage extends StatelessWidget {
                                           fontSize: 15,
                                         ),
                                       ),
-                                      const SizedBox(height: 5),
+                                      const SizedBox(height: 12),
                                       Flexible(child: Text(note.deskripsi))
                                     ],
                                   ),
@@ -280,20 +228,91 @@ class SearchNotePage extends StatelessWidget {
                             );
                           },
                           itemCount: state.note.length,
-                        ),
-                      );
+                        );
+                      } else {
+                        if (state.note.isEmpty) {
+                          return SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.2,
+                            child: const Center(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                "Note kosong,mari buat note yuk!",
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ),
+                          );
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final note = state.note[index];
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () {
+                                  context
+                                      .read<ValidasiSearchBloc>()
+                                      .add(ShowButtonClear(title: ""));
+                                  context.read<SearchNoteBloc>().add(SearchNote(
+                                      userId: note.userId, title: ""));
+                                  context.read<DetailNoteBloc>().add(
+                                        GetDetailNote(
+                                          userId: note.userId,
+                                          noteId: note.noteId,
+                                        ),
+                                      );
+                                  Navigator.of(context).pushNamed(
+                                    "/detail",
+                                    arguments: DetailArguments(
+                                      userId: note.userId,
+                                      noteId: note.noteId,
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(20),
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.15,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          note.title,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Flexible(child: Text(note.deskripsi))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount: state.note.length,
+                          ),
+                        );
+                      }
+                    } else if (state is SearchNoteError) {
+                      if (layoutState.isGrid) {
+                        return const ShimmerLoading();
+                      } else {
+                        return const ShimmerLoadingRow();
+                      }
                     }
-                  } else if (state is SearchNoteError) {
-                    if (layoutState.isGrid) {
-                      return const ShimmerLoading();
-                    } else {
-                      return const ShimmerLoadingRow();
-                    }
-                  }
-                  return Container();
-                },
-              );
-            },
+                    return Container();
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),

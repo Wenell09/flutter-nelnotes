@@ -160,48 +160,60 @@ class DetailPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<DetailNoteBloc, DetailNoteState>(
-        builder: (context, state) {
-          if (state is DetailNoteLoading) {
-            return const ShimmerLoading();
-          } else if (state is DetailNoteLoaded) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const ScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final detailNote = state.detailNote[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        detailNote.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        detailNote.deskripsi,
-                        style: const TextStyle(fontSize: 17),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        "dibuat pada: ${formatTimestamp(detailNote.createdAt)}",
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  );
-                },
-                itemCount: state.detailNote.length,
-              ),
-            );
-          } else {
-            return const ShimmerLoading();
+      body: BlocListener<NoteBloc, NoteState>(
+        listener: (context, state) {
+          if (state is NoteEditSuccess) {
+            context.read<DetailNoteBloc>().add(
+                  GetDetailNote(
+                    userId: userId,
+                    noteId: noteId,
+                  ),
+                );
           }
         },
+        child: BlocBuilder<DetailNoteBloc, DetailNoteState>(
+          builder: (context, state) {
+            if (state is DetailNoteLoading) {
+              return const ShimmerLoading();
+            } else if (state is DetailNoteLoaded) {
+              return Padding(
+                padding: const EdgeInsets.all(20),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final detailNote = state.detailNote[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          detailNote.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          detailNote.deskripsi,
+                          style: const TextStyle(fontSize: 17),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          "dibuat pada: ${formatTimestamp(detailNote.createdAt)}",
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    );
+                  },
+                  itemCount: state.detailNote.length,
+                ),
+              );
+            } else {
+              return const ShimmerLoading();
+            }
+          },
+        ),
       ),
     );
   }

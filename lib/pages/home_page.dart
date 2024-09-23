@@ -122,265 +122,78 @@ class HomePage extends StatelessWidget {
           const SizedBox(
             height: 5,
           ),
-          BlocBuilder<LayoutBloc, LayoutState>(
-            bloc: context.read<LayoutBloc>()..add(LayoutLoad()),
-            builder: (context, layoutState) {
-              return BlocBuilder<NoteBloc, NoteState>(
-                builder: (context, state) {
-                  if (state is NoteLoading) {
-                    if (layoutState.isGrid) {
-                      return const ShimmerLoading();
-                    } else {
-                      return const ShimmerLoadingRow();
-                    }
-                  } else if (state is NoteLoaded) {
-                    if (layoutState.isGrid) {
-                      if (state.notes.isEmpty) {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 1.2,
-                          child: const Center(
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              "Note kosong,mari buat note yuk!",
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          ),
-                        );
+          BlocListener<NoteBloc, NoteState>(
+            listener: (context, state) {
+              if (state is NoteAddSuccess) {
+                context.read<NoteBloc>().add(GetNote(userId: state.userId));
+              } else if (state is NoteEditSuccess) {
+                context.read<NoteBloc>().add(GetNote(userId: state.userId));
+              } else if (state is NoteDeleteSuccess) {
+                context.read<NoteBloc>().add(GetNote(userId: state.userId));
+              } else if (state is NoteAddPinSuccess) {
+                context.read<NoteBloc>().add(GetNote(userId: state.userId));
+              } else if (state is NoteDeletePinSuccess) {
+                context.read<NoteBloc>().add(GetNote(userId: state.userId));
+              }
+            },
+            child: BlocBuilder<LayoutBloc, LayoutState>(
+              bloc: context.read<LayoutBloc>()..add(LayoutLoad()),
+              builder: (context, layoutState) {
+                return BlocBuilder<NoteBloc, NoteState>(
+                  builder: (context, state) {
+                    if (state is NoteLoading) {
+                      if (layoutState.isGrid) {
+                        return const ShimmerLoading();
                       } else {
-                        final isPin = state.notes.any(
-                          (element) => element.isPin == true,
-                        );
-                        if (isPin) {
-                          final filteredPinNote = state.notes
-                              .where(
-                                (element) => element.isPin == true,
-                              )
-                              .toList();
-                          final filteredNote = state.notes
-                              .where(
-                                (element) => element.isPin == false,
-                              )
-                              .toList();
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 20, left: 30),
-                                child: Text("Dipasangi pin"),
-                              ),
-                              GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 15,
-                                  crossAxisSpacing: 15,
-                                  childAspectRatio: 2 / 2.3,
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                itemBuilder: (context, index) {
-                                  final note = filteredPinNote[index];
-                                  return InkWell(
-                                    borderRadius: BorderRadius.circular(10),
-                                    onTap: () {
-                                      context.read<DetailNoteBloc>().add(
-                                            GetDetailNote(
-                                              userId: note.userId,
-                                              noteId: note.noteId,
-                                            ),
-                                          );
-                                      Navigator.of(context).pushNamed(
-                                        "/detail",
-                                        arguments: DetailArguments(
-                                          userId: note.userId,
-                                          noteId: note.noteId,
-                                        ),
-                                      );
-                                    },
-                                    child: Card(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              note.title,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Flexible(
-                                                child: Text(note.deskripsi))
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                itemCount: filteredPinNote.length,
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 15, left: 30),
-                                child: Text("Lainnya"),
-                              ),
-                              GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 15,
-                                  crossAxisSpacing: 15,
-                                  childAspectRatio: 2 / 2.3,
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                itemBuilder: (context, index) {
-                                  final note = filteredNote[index];
-                                  return InkWell(
-                                    borderRadius: BorderRadius.circular(10),
-                                    onTap: () {
-                                      context.read<DetailNoteBloc>().add(
-                                            GetDetailNote(
-                                              userId: note.userId,
-                                              noteId: note.noteId,
-                                            ),
-                                          );
-                                      Navigator.of(context).pushNamed(
-                                        "/detail",
-                                        arguments: DetailArguments(
-                                          userId: note.userId,
-                                          noteId: note.noteId,
-                                        ),
-                                      );
-                                    },
-                                    child: Card(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              note.title,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Flexible(
-                                                child: Text(note.deskripsi))
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                itemCount: filteredNote.length,
-                              ),
-                            ],
-                          );
-                        }
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 15,
-                            crossAxisSpacing: 15,
-                            childAspectRatio: 2 / 2.3,
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          itemBuilder: (context, index) {
-                            final note = state.notes[index];
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: () {
-                                context.read<DetailNoteBloc>().add(
-                                      GetDetailNote(
-                                        userId: note.userId,
-                                        noteId: note.noteId,
-                                      ),
-                                    );
-                                Navigator.of(context).pushNamed(
-                                  "/detail",
-                                  arguments: DetailArguments(
-                                    userId: note.userId,
-                                    noteId: note.noteId,
-                                  ),
-                                );
-                              },
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        note.title,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Flexible(child: Text(note.deskripsi))
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          itemCount: state.notes.length,
-                        );
+                        return const ShimmerLoadingRow();
                       }
-                    } else {
-                      if (state.notes.isEmpty) {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 1.2,
-                          child: const Center(
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              "Note kosong,mari buat note yuk!",
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          ),
-                        );
-                      } else {
-                        final isPin = state.notes.any(
-                          (element) => element.isPin == true,
-                        );
-                        if (isPin) {
-                          final filteredPinNote = state.notes
-                              .where(
-                                (element) => element.isPin == true,
-                              )
-                              .toList();
-                          final filteredNote = state.notes
-                              .where(
-                                (element) => element.isPin == false,
-                              )
-                              .toList();
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 20, left: 30),
-                                child: Text("Dipasangi pin"),
+                    } else if (state is NoteLoaded) {
+                      if (layoutState.isGrid) {
+                        if (state.notes.isEmpty) {
+                          return SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.2,
+                            child: const Center(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                "Note kosong,mari buat note yuk!",
+                                style: TextStyle(fontSize: 17),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: ListView.builder(
+                            ),
+                          );
+                        } else {
+                          final isPin = state.notes.any(
+                            (element) => element.isPin == true,
+                          );
+                          if (isPin) {
+                            final filteredPinNote = state.notes
+                                .where(
+                                  (element) => element.isPin == true,
+                                )
+                                .toList();
+                            final filteredNote = state.notes
+                                .where(
+                                  (element) => element.isPin == false,
+                                )
+                                .toList();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 20, left: 30),
+                                  child: Text("Dipasangi pin"),
+                                ),
+                                GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 15,
+                                    crossAxisSpacing: 15,
+                                    childAspectRatio: 2 / 2.3,
+                                  ),
+                                  padding: const EdgeInsets.all(10),
                                   itemBuilder: (context, index) {
                                     final note = filteredPinNote[index];
                                     return InkWell(
@@ -401,14 +214,8 @@ class HomePage extends StatelessWidget {
                                         );
                                       },
                                       child: Card(
-                                        child: Container(
+                                        child: Padding(
                                           padding: const EdgeInsets.all(20),
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.15,
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -420,7 +227,7 @@ class HomePage extends StatelessWidget {
                                                   fontSize: 15,
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
+                                              const SizedBox(height: 12),
                                               Flexible(
                                                   child: Text(note.deskripsi))
                                             ],
@@ -431,16 +238,23 @@ class HomePage extends StatelessWidget {
                                   },
                                   itemCount: filteredPinNote.length,
                                 ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 15, left: 30),
-                                child: Text("Lainnya"),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: ListView.builder(
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 15, left: 30),
+                                  child: Text(
+                                      (filteredNote.isEmpty) ? "" : "Lainnya"),
+                                ),
+                                GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 15,
+                                    crossAxisSpacing: 15,
+                                    childAspectRatio: 2 / 2.3,
+                                  ),
+                                  padding: const EdgeInsets.all(10),
                                   itemBuilder: (context, index) {
                                     final note = filteredNote[index];
                                     return InkWell(
@@ -461,14 +275,8 @@ class HomePage extends StatelessWidget {
                                         );
                                       },
                                       child: Card(
-                                        child: Container(
+                                        child: Padding(
                                           padding: const EdgeInsets.all(20),
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.15,
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -480,7 +288,7 @@ class HomePage extends StatelessWidget {
                                                   fontSize: 15,
                                                 ),
                                               ),
-                                              const SizedBox(height: 5),
+                                              const SizedBox(height: 12),
                                               Flexible(
                                                   child: Text(note.deskripsi))
                                             ],
@@ -491,15 +299,20 @@ class HomePage extends StatelessWidget {
                                   },
                                   itemCount: filteredNote.length,
                                 ),
-                              ),
-                            ],
-                          );
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: ListView.builder(
+                              ],
+                            );
+                          }
+                          return GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 15,
+                              crossAxisSpacing: 15,
+                              childAspectRatio: 2 / 2.3,
+                            ),
+                            padding: const EdgeInsets.all(10),
                             itemBuilder: (context, index) {
                               final note = state.notes[index];
                               return InkWell(
@@ -520,23 +333,21 @@ class HomePage extends StatelessWidget {
                                   );
                                 },
                                 child: Card(
-                                  child: Container(
+                                  child: Padding(
                                     padding: const EdgeInsets.all(20),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.15,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
+                                          maxLines: 2,
                                           note.title,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
                                           ),
                                         ),
-                                        const SizedBox(height: 5),
+                                        const SizedBox(height: 12),
                                         Flexible(child: Text(note.deskripsi))
                                       ],
                                     ),
@@ -545,21 +356,235 @@ class HomePage extends StatelessWidget {
                               );
                             },
                             itemCount: state.notes.length,
-                          ),
-                        );
+                          );
+                        }
+                      } else {
+                        if (state.notes.isEmpty) {
+                          return SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 1.2,
+                            child: const Center(
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                "Note kosong,mari buat note yuk!",
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ),
+                          );
+                        } else {
+                          final isPin = state.notes.any(
+                            (element) => element.isPin == true,
+                          );
+                          if (isPin) {
+                            final filteredPinNote = state.notes
+                                .where(
+                                  (element) => element.isPin == true,
+                                )
+                                .toList();
+                            final filteredNote = state.notes
+                                .where(
+                                  (element) => element.isPin == false,
+                                )
+                                .toList();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 20, left: 30),
+                                  child: Text("Dipasangi pin"),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      final note = filteredPinNote[index];
+                                      return InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () {
+                                          context.read<DetailNoteBloc>().add(
+                                                GetDetailNote(
+                                                  userId: note.userId,
+                                                  noteId: note.noteId,
+                                                ),
+                                              );
+                                          Navigator.of(context).pushNamed(
+                                            "/detail",
+                                            arguments: DetailArguments(
+                                              userId: note.userId,
+                                              noteId: note.noteId,
+                                            ),
+                                          );
+                                        },
+                                        child: Card(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(20),
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.15,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  note.title,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Flexible(
+                                                    child: Text(note.deskripsi))
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: filteredPinNote.length,
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 15, left: 30),
+                                  child: Text(
+                                      (filteredNote.isEmpty) ? "" : "Lainnya"),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      final note = filteredNote[index];
+                                      return InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () {
+                                          context.read<DetailNoteBloc>().add(
+                                                GetDetailNote(
+                                                  userId: note.userId,
+                                                  noteId: note.noteId,
+                                                ),
+                                              );
+                                          Navigator.of(context).pushNamed(
+                                            "/detail",
+                                            arguments: DetailArguments(
+                                              userId: note.userId,
+                                              noteId: note.noteId,
+                                            ),
+                                          );
+                                        },
+                                        child: Card(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(20),
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.15,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  note.title,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                Flexible(
+                                                    child: Text(note.deskripsi))
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: filteredNote.length,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final note = state.notes[index];
+                                return InkWell(
+                                  borderRadius: BorderRadius.circular(10),
+                                  onTap: () {
+                                    context.read<DetailNoteBloc>().add(
+                                          GetDetailNote(
+                                            userId: note.userId,
+                                            noteId: note.noteId,
+                                          ),
+                                        );
+                                    Navigator.of(context).pushNamed(
+                                      "/detail",
+                                      arguments: DetailArguments(
+                                        userId: note.userId,
+                                        noteId: note.noteId,
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      width: MediaQuery.of(context).size.width,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.15,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            note.title,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Flexible(child: Text(note.deskripsi))
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              itemCount: state.notes.length,
+                            ),
+                          );
+                        }
+                      }
+                    } else if (state is NoteError) {
+                      if (layoutState.isGrid) {
+                        return const ShimmerLoading();
+                      } else {
+                        return const ShimmerLoadingRow();
                       }
                     }
-                  } else if (state is NoteError) {
-                    if (layoutState.isGrid) {
-                      return const ShimmerLoading();
-                    } else {
-                      return const ShimmerLoadingRow();
-                    }
-                  }
-                  return Container();
-                },
-              );
-            },
+                    return Container();
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),

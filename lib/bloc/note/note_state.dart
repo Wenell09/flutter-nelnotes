@@ -41,16 +41,22 @@ final class NoteEditSuccess extends NoteState {
 }
 
 final class NoteDeleteSuccess extends NoteState {
+  final String userId;
+  NoteDeleteSuccess({required this.userId});
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userId];
 }
 
 final class NoteAddPinSuccess extends NoteState {
+  final String userId;
+  NoteAddPinSuccess({required this.userId});
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userId];
 }
 
 final class NoteDeletePinSuccess extends NoteState {
+  final String userId;
+  NoteDeletePinSuccess({required this.userId});
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userId];
 }
