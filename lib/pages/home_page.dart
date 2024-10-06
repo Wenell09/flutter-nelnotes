@@ -84,15 +84,17 @@ class HomePage extends StatelessWidget {
                               if (state is UserLoading) {
                                 return const ShimmerLoadingCircle();
                               } else if (state is UserLoaded) {
-                                return InkWell(
-                                  onTap: () => Navigator.of(context)
-                                      .pushNamed("/profile"),
-                                  child: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(state.user[0].image),
-                                    backgroundColor: Colors.white,
-                                  ),
-                                );
+                                (state.user.isEmpty)
+                                    ? const ShimmerLoadingCircle()
+                                    : InkWell(
+                                        onTap: () => Navigator.of(context)
+                                            .pushNamed("/profile"),
+                                        child: CircleAvatar(
+                                          backgroundImage:
+                                              NetworkImage(state.user[0].image),
+                                          backgroundColor: Colors.white,
+                                        ),
+                                      );
                               }
                               return const ShimmerLoadingCircle();
                             },
